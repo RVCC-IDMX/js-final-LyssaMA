@@ -1,8 +1,11 @@
-import { scaleFactor } from "src/constants.js";
-import { k } from "./kaboomCtx";
-import { displayDialogue } from "src/utils.js";
 
-k.loadSprite("spritesheet", "public/spritesheet.png", {
+
+
+import { dialogueData, scaleFactor } from "./constants.js";
+import { k } from "./kaboomCtx";
+import { displayDialogue, setCamScale } from "./utils.js";
+
+k.loadSprite("spritesheet", "./spritesheet.png", {
     sliceX: 39,
     sliceY: 31,
     anims: {
@@ -15,12 +18,12 @@ k.loadSprite("spritesheet", "public/spritesheet.png", {
     },
 });
 
-k.loadSprite("map", "public/map.png");
+k.loadSprite("map", "./map.png");
 
 k.setBackground(k.Color.fromHex("#311047"));
 
 k.scene("main", async () => {
-    const mapData = await (await fetch("public/map.json")).json();
+    const mapData = await (await fetch("./map.json")).json();
     const layers = mapData.layers;
 
     const map = k.add([k.sprite("map"), k.pos(0), k.scale(scaleFactor)]);
@@ -51,29 +54,30 @@ k.scene("main", async () => {
                         shape: new k.Rect(k.vec2(0), boundary.width, boundary.height),
                     }),
                     k.body({ isStatic: true }),
-                    k.body(boundary.x, boundary.y),
+                    k.pos(boundary.x, boundary.y),
                     boundary.name,
                 ]);
 
-                if (boundary.name)
+                if (boundary.name) {
                     player.onCollide(boundary.name, () => {
                         player.isInDialogue = true;
                         displayDialogue(dialogueData[boundary.name], () => (player.isInDialogue = false));
                     });
+                }
             }
+            continue;
         }
-        continue;
-    }
 
-    if (layer.name === "spawnpoints") {
-        for (const entity of layer.objects) {
-            if (entity.name === "player") {
-                player.pos = k.vec2(
-                    (map.pos.x + entity.x) * scaleFactor,
-                    (map.pos.y + entity.y) * scaleFactor
-                );
-                k.add(player);
-                continue;
+        if (layer.name === "spawnpoints") {
+            for (const entity of layer.objects) {
+                if (entity.name === "player") {
+                    player.pos = k.vec2(
+                        (map.pos.x + entity.x) * scaleFactor,
+                        (map.pos.y + entity.y) * scaleFactor
+                    );
+                    k.add(player);
+                    continue;
+                }
             }
         }
     }
@@ -96,12 +100,12 @@ k.scene("main", async () => {
 
         const mouseAngle = player.pos.angle(worldMousePos)
 
-        const lowerbound = 50;
+        const lowerBound = 50;
         const upperBound = 125;
 
         if (
-            mouseAngle > -lowerBound &&
-            mouseAngle < -upperBound &&
+            mouseAngle > lowerBound &&
+            mouseAngle < upperBound &&
             player.curAnim() !== "walk-up"
         ) {
             player.play("walk-up");
@@ -110,7 +114,7 @@ k.scene("main", async () => {
         }
 
         if (
-            mouseAngle > -lowerBound &&
+            mouseAngle < -lowerBound &&
             mouseAngle < -upperBound &&
             player.curAnim() !== "walk-down"
         ) {
