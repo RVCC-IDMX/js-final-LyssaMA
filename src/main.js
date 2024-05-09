@@ -1,8 +1,8 @@
-import { scaleFactor } from "./constants.js";
+import { scaleFactor } from "src/constants.js";
 import { k } from "./kaboomCtx";
-import { displayDialogue } from "./utils";
+import { displayDialogue } from "src/utils.js";
 
-k.loadSprite("spritesheet", "./spritesheet.png", {
+k.loadSprite("spritesheet", "public/spritesheet.png", {
     sliceX: 39,
     sliceY: 31,
     anims: {
@@ -15,12 +15,12 @@ k.loadSprite("spritesheet", "./spritesheet.png", {
     },
 });
 
-k.loadSprite("map", "./map.png");
+k.loadSprite("map", "public/map.png");
 
 k.setBackground(k.Color.fromHex("#311047"));
 
 k.scene("main", async () => {
-    const mapData = await (await fetch("./map.json")).json();
+    const mapData = await (await fetch("public/map.json")).json();
     const layers = mapData.layers;
 
     const map = k.add([k.sprite("map"), k.pos(0), k.scale(scaleFactor)]);
@@ -97,11 +97,11 @@ k.scene("main", async () => {
         const mouseAngle = player.pos.angle(worldMousePos)
 
         const lowerbound = 50;
-        const upperBpund = 125;
+        const upperBound = 125;
 
         if (
-            mouseAngle > -lowerbound &&
-            mouseAngle < -upperBpund &&
+            mouseAngle > -lowerBound &&
+            mouseAngle < -upperBound &&
             player.curAnim() !== "walk-up"
         ) {
             player.play("walk-up");
@@ -110,12 +110,12 @@ k.scene("main", async () => {
         }
 
         if (
-            mouseAngle > -lowerbound &&
+            mouseAngle > -lowerBound &&
             mouseAngle < -upperBound &&
             player.curAnim() !== "walk-down"
         ) {
             player.play("walk-down");
-            player.direction = "up";
+            player.direction = "down";
             return;
         }
 
@@ -126,7 +126,7 @@ k.scene("main", async () => {
             return;
         }
 
-        if (Math.abs(mouseAngle) < lowerbound) {
+        if (Math.abs(mouseAngle) < lowerBound) {
             player.flipX = true;
             if (player.curAnim() !== "walk-side") player.play("walk-side")
             player.direction = "left";
@@ -136,11 +136,11 @@ k.scene("main", async () => {
 
     k.onMouseRelease(() => {
     if (player.direction === "down") {
-        player.play = ("idle-down");
+        player.play("idle-down");
         return;
     }
     if (player.direction === "up") {
-        player.play = ("idle-up");
+        player.play("idle-up");
         return;
     }
 
