@@ -21,7 +21,7 @@ const closeBtn = document.getElementById("close");
 
 function onCloseBtnClick() {
     onDisplayEnd();
-    dialogue.style.display = "none";
+    dialogue.style.display = "";
     dialogue.innerHTML = "";
     clearInterval(intervalRef);
     closeBtn.removeEventListener("click", onCloseBtnClick);
